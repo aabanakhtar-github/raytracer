@@ -7,9 +7,9 @@
 class Renderer {
 public:
   Renderer();
-  ~Renderer(){};
+  ~Renderer();
   auto putPixel(int x, int y, const Color &color) -> void;
-
+  auto updateFrame() -> void;
   auto getValid() -> bool { return valid_; }
 
 private:

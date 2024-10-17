@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "SDL3/SDL_render.h"
 #include <iostream>
 
 Renderer::Renderer() {
@@ -13,24 +14,32 @@ Renderer::Renderer() {
     std::cerr << "Cannot create renderer! " << SDL_GetError() << "\n";
     return;
   }
+
   valid_ = true;
+}
 
-  bool running = true;
-  SDL_Event event;
-  while (running) {
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_EVENT_QUIT) {
-        running = false;
-      }
-    }
+auto Renderer::putPixel(int x, int y, const Color &color) -> void {
+  auto r = std::min(255U, static_cast<unsigned int>(color.R * 255));
+  auto g = std::min(255U, static_cast<unsigned int>(color.G * 255));
+  auto b = std::min(255U, static_cast<unsigned int>(color.B * 255));
+  auto a = std::min(255U, static_cast<unsigned int>(color.A * 255));
+  std::uint8_t pr, pg, pb, pa;
+  SDL_GetRenderDrawColor(renderer_, &pr, &pg, &pb, &pa);
+  SDL_SetRenderDrawColor(renderer_, (int)r, (int)g, (int)b, (int)a);
+  SDL_RenderPoint(renderer_, x, y);
+  SDL_RenderPresent(renderer_);
+  SDL_SetRenderDrawColor(renderer_, pr, pg, pb, pa);
+  SDL_RenderClear(renderer_);
+}
 
-    SDL_RenderClear(renderer_);
-    // Add your rendering logic here
-
-    SDL_RenderPresent(renderer_);
+Renderer::~Renderer() {
+  if (renderer_ != nullptr) {
+    SDL_DestroyRenderer(renderer_);
   }
-
-  SDL_DestroyRenderer(renderer_);
-  SDL_DestroyWindow(window_);
-  SDL_Quit();
+  if (window_ != nullptr) {
+    SDL_DestroyWindow(window_);
+  }
+  renderer_ = nullptr;
+  window_ = nullptr;
+  valid_ = false;
 }
