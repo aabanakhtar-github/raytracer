@@ -19,6 +19,8 @@ Renderer::Renderer() {
 }
 
 auto Renderer::putPixel(int x, int y, const Color &color) -> void {
+  if (!getValid())
+    return;
   auto r = std::min(255U, static_cast<unsigned int>(color.R * 255));
   auto g = std::min(255U, static_cast<unsigned int>(color.G * 255));
   auto b = std::min(255U, static_cast<unsigned int>(color.B * 255));
@@ -27,9 +29,7 @@ auto Renderer::putPixel(int x, int y, const Color &color) -> void {
   SDL_GetRenderDrawColor(renderer_, &pr, &pg, &pb, &pa);
   SDL_SetRenderDrawColor(renderer_, (int)r, (int)g, (int)b, (int)a);
   SDL_RenderPoint(renderer_, x, y);
-  SDL_RenderPresent(renderer_);
   SDL_SetRenderDrawColor(renderer_, pr, pg, pb, pa);
-  SDL_RenderClear(renderer_);
 }
 
 Renderer::~Renderer() {

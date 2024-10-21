@@ -23,7 +23,11 @@ auto main(int argc, char *argv[]) -> int {
         quit = true;
       }
     }
-    renderer.putPixel(100, 100, Color{1.0, 1.0, 1.0, 1.0});
+    renderer.putPixel(100, 100, {1.0, 1.0, 1.0, 1.0});
+    for (int i = 0; i < 900; ++i) {
+      renderer.putPixel(50, i, {1.0, 0.0, 1.0, 1.0});
+    }
+    renderer.clear();
   }
 
   SDL_Quit();
