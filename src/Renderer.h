@@ -18,6 +18,9 @@ public:
     SDL_RenderClear(renderer_);
   }
 
+  constexpr static auto getWidth() -> int { return 900; }
+  constexpr static auto getHeight() -> int { return 600; }
+
 private:
   bool valid_ = false;
   SDL_Window *window_;

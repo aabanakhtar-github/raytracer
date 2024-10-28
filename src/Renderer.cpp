@@ -3,7 +3,7 @@
 #include <iostream>
 
 Renderer::Renderer() {
-  window_ = SDL_CreateWindow("raytracer", 900, 600, 0);
+  window_ = SDL_CreateWindow("raytracer", getWidth(), getHeight(), 0);
   if (window_ == nullptr) {
     std::cerr << "Cannot create window! " << SDL_GetError() << "\n";
     return;
@@ -24,10 +24,9 @@ auto Renderer::putPixel(int x, int y, const Color &color) -> void {
   auto r = std::min(255U, static_cast<unsigned int>(color.R * 255));
   auto g = std::min(255U, static_cast<unsigned int>(color.G * 255));
   auto b = std::min(255U, static_cast<unsigned int>(color.B * 255));
-  auto a = std::min(255U, static_cast<unsigned int>(color.A * 255));
-  std::uint8_t pr, pg, pb, pa;
+  std::uint8_t pr, pg, pb, pa = 0;
   SDL_GetRenderDrawColor(renderer_, &pr, &pg, &pb, &pa);
-  SDL_SetRenderDrawColor(renderer_, (int)r, (int)g, (int)b, (int)a);
+  SDL_SetRenderDrawColor(renderer_, (int)r, (int)g, (int)b, 0);
   SDL_RenderPoint(renderer_, x, y);
   SDL_SetRenderDrawColor(renderer_, pr, pg, pb, pa);
 }
