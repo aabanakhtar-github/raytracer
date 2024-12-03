@@ -4,7 +4,23 @@
 #include "Vector3.h"
 #include <iostream>
 
+auto hitSphere(const Math::Ray &ray, const Math::Point3 center,
+               const float radius) -> bool {
+  auto ray_dir = ray.direction();
+  auto ray_start = ray.origin();
+  auto a = Math::dot(ray_dir, ray_dir);
+  auto b = -2 * Math::dot(ray_dir, center - ray_start);
+  auto c =
+      Math::dot((center - ray_start), (center - ray_start)) - radius * radius;
+  auto discriminant = b * b - 4 * a * c;
+  return (discriminant >= 0);
+}
+
 auto getRayColor(const Math::Ray &r) -> Color {
+  if (hitSphere(r, Math::Point3{0, 0, -1}, 0.25)) {
+    return Color{1, 0, 0};
+  }
+
   auto start_color = Math::Vector3{0.0, 0.0, 1.0};
   auto end_color = Math::Vector3{1.0, 1.0, 1.0};
   // lerp based on y pos
@@ -20,7 +36,7 @@ auto raytracer(Renderer &renderer) -> void {
       double(Renderer::getWidth()) / double(Renderer::getHeight());
   constexpr static auto viewport_height = 2.0;
   // scale the viewport width based on the height
-  constexpr static auto viewport_width = viewport_height / aspect_ratio;
+  constexpr static auto viewport_width = viewport_height * aspect_ratio;
   const auto camera_center = Math::Vector3{0, 0, 0};
   // these vectors represent the width and height of the viewport
   // u = width
@@ -43,8 +59,8 @@ auto raytracer(Renderer &renderer) -> void {
   auto pixel00_location =
       viewport_upper_left + 0.5 * (delta_viewport_u + delta_viewport_v);
   // render
-  for (auto i = 0; i < 600; ++i) {
-    for (auto j = 0; j < 900; ++j) {
+  for (auto i = 0; i < Renderer::getHeight(); ++i) {
+    for (auto j = 0; j < Renderer::getWidth(); ++j) {
       auto pixel_location = pixel00_location + double(j) * delta_viewport_u +
                             double(i) * delta_viewport_v;
       auto ray_direction = pixel_location - camera_center;

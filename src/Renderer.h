@@ -18,8 +18,8 @@ public:
     SDL_RenderClear(renderer_);
   }
 
-  constexpr static auto getWidth() -> int { return 900; }
-  constexpr static auto getHeight() -> int { return 600; }
+  constexpr static auto getWidth() -> int const { return 900; }
+  constexpr static auto getHeight() -> int const { return 600; }
 
 private:
   bool valid_ = false;
