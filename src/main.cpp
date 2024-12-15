@@ -2,25 +2,49 @@
 #include "Renderer.h"
 #include "SDL3/SDL_events.h"
 #include "Vector3.h"
+#include <cstdint>
 #include <iostream>
 
-auto hitSphere(const Math::Ray &ray, const Math::Point3 center,
-               const float radius) -> bool {
-  auto ray_dir = ray.direction();
-  auto ray_start = ray.origin();
-  auto a = Math::dot(ray_dir, ray_dir);
-  auto b = -2 * Math::dot(ray_dir, center - ray_start);
-  auto c =
-      Math::dot((center - ray_start), (center - ray_start)) - radius * radius;
-  auto discriminant = b * b - 4 * a * c;
-  return (discriminant >= 0);
+auto hitSphere(const Math::Point3 &center, double radius,
+               const Math::Ray &r) -> double {
+  // Calculate vector from ray origin to the sphere's center
+  auto oc = center - r.origin();
+
+  // a is the length squared of the ray direction (always 1.0 if normalized)
+  auto a = dot(r.direction(), r.direction());
+
+  // h is the dot product of the ray direction and the vector from the ray
+  // origin to the sphere center
+  auto h = dot(r.direction(), oc);
+
+  // c is the length squared of the vector from ray origin to sphere center
+  // minus the radius squared
+  auto c = oc.length() * oc.length() - radius * radius;
+
+  // Calculate the discriminant to check if there is an intersection
+  auto discriminant = h * h - a * c;
+
+  // If discriminant is negative, no intersection
+  if (discriminant < 0.0) {
+    return -1.0;
+  } else {
+    // Calculate the distance to the intersection
+    return (-h - std::sqrt(discriminant)) / a;
+  }
+}
+
+inline auto operator*(double scale, const Color &c) -> Color {
+  return {c.R * scale, c.G * scale, c.B * scale};
 }
 
 auto getRayColor(const Math::Ray &r) -> Color {
-  if (hitSphere(r, Math::Point3{0, 0, -1}, 0.25)) {
-    return Color{1, 0, 0};
+  auto t = hitSphere({0.0, 0.0, -1.0}, 0.25, r);
+  if (t > 0.0) {
+    std::cout << "yes" << std::endl;
+    auto hit_point = r.at(t);
+    auto normal = Math::unitVector(hit_point - Math::Vector3{0.0, 0.0, -1.0});
+    return 0.5 * Color{normal.x + 1.0, normal.y + 1.0, normal.z + 1.0};
   }
-
   auto start_color = Math::Vector3{0.0, 0.0, 1.0};
   auto end_color = Math::Vector3{1.0, 1.0, 1.0};
   // lerp based on y pos
@@ -64,6 +88,7 @@ auto raytracer(Renderer &renderer) -> void {
       auto pixel_location = pixel00_location + double(j) * delta_viewport_u +
                             double(i) * delta_viewport_v;
       auto ray_direction = pixel_location - camera_center;
+      ray_direction /= ray_direction.length();
       auto ray = Math::Ray{camera_center, ray_direction};
       auto color = getRayColor(ray);
       renderer.putPixel(j, i, color);

@@ -1,7 +1,6 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include <cstdint>
 #include <ostream>
 
 struct Color {
@@ -14,5 +13,4 @@ inline auto operator<<(std::ostream &out,
                        const Color &color) -> std::ostream & {
   return out << color.R * 255 << " " << color.G * 255 << " " << color.B * 255;
 }
-
 #endif // !COLOR_H
