@@ -5,31 +5,21 @@
 #include <cstdint>
 #include <iostream>
 
-auto hitSphere(const Math::Point3 &center, double radius,
-               const Math::Ray &r) -> double {
-  // Calculate vector from ray origin to the sphere's center
-  auto oc = center - r.origin();
+auto hitSphere(const Math::Ray &ray, const Math::Point3 center,
+               const float radius) -> double {
+  // definition of a circle
+  // point x y z -> (x - x)^2 + (y - y)^2 + (z - z)^2 = r^2
+  // or (center - point) dot (center - point)
 
-  // a is the length squared of the ray direction (always 1.0 if normalized)
-  auto a = dot(r.direction(), r.direction());
-
-  // h is the dot product of the ray direction and the vector from the ray
-  // origin to the sphere center
-  auto h = dot(r.direction(), oc);
-
-  // c is the length squared of the vector from ray origin to sphere center
-  // minus the radius squared
-  auto c = oc.length() * oc.length() - radius * radius;
-
-  // Calculate the discriminant to check if there is an intersection
+  auto a = 1;
+  auto oc = center - ray.origin();
+  auto c = Math::dot(oc, oc) - radius * radius;
+  auto h = Math::dot(ray.direction(), oc);
   auto discriminant = h * h - a * c;
-
-  // If discriminant is negative, no intersection
-  if (discriminant < 0.0) {
+  if (discriminant < 0) {
     return -1.0;
   } else {
-    // Calculate the distance to the intersection
-    return (-h - std::sqrt(discriminant)) / a;
+    return (h - std::sqrt(discriminant)) / a;
   }
 }
 
@@ -38,7 +28,7 @@ inline auto operator*(double scale, const Color &c) -> Color {
 }
 
 auto getRayColor(const Math::Ray &r) -> Color {
-  auto t = hitSphere({0.0, 0.0, -1.0}, 0.25, r);
+  auto t = hitSphere(r, {0.0, 0.0, -1.0}, 0.25);
   if (t > 0.0) {
     std::cout << "yes" << std::endl;
     auto hit_point = r.at(t);
@@ -87,8 +77,7 @@ auto raytracer(Renderer &renderer) -> void {
     for (auto j = 0; j < Renderer::getWidth(); ++j) {
       auto pixel_location = pixel00_location + double(j) * delta_viewport_u +
                             double(i) * delta_viewport_v;
-      auto ray_direction = pixel_location - camera_center;
-      ray_direction /= ray_direction.length();
+      auto ray_direction = Math::unitVector(pixel_location - camera_center);
       auto ray = Math::Ray{camera_center, ray_direction};
       auto color = getRayColor(ray);
       renderer.putPixel(j, i, color);
@@ -97,6 +86,14 @@ auto raytracer(Renderer &renderer) -> void {
 }
 
 auto main(int argc, char *argv[]) -> int {
+  Math::Point3 center = {0.0, 0.0, -1.0};
+  double radius = 0.5;
+  Math::Ray testRay({0.0, 0.0, 0.0}, {0.0, 0.0, -1.0});
+  auto t = hitSphere(testRay, center, radius);
+  std::cout << "Intersection at t: " << t << std::endl;
+  if (t > 0) {
+    std::cout << "yes";
+  }
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     std::cerr << "Could not initalize SDL3!";
     return -1;
