@@ -1,9 +1,10 @@
+#include "Hittable.h"
 #include "Ray.h"
 #include "Renderer.h"
 #include "SDL3/SDL_events.h"
 #include "Vector3.h"
-#include <cstdint>
 #include <iostream>
+#include <memory>
 
 auto hitSphere(const Math::Ray &ray, const Math::Point3 center,
                const float radius) -> double {
@@ -27,12 +28,12 @@ inline auto operator*(double scale, const Color &c) -> Color {
   return {c.R * scale, c.G * scale, c.B * scale};
 }
 
-auto getRayColor(const Math::Ray &r) -> Color {
-  auto t = hitSphere(r, {0.0, 0.0, -1.0}, 0.25);
-  if (t > 0.0) {
+auto getRayColor(const Math::Ray &r, const HittableList &world) -> Color {
+  auto result = HitResult{};
+  if (world.hit(r, 0, 600000.0, result)) {
     std::cout << "yes" << std::endl;
-    auto hit_point = r.at(t);
-    auto normal = Math::unitVector(hit_point - Math::Vector3{0.0, 0.0, -1.0});
+    auto &hit_point = result.Location;
+    auto &normal = result.Normal;
     return 0.5 * Color{normal.x + 1.0, normal.y + 1.0, normal.z + 1.0};
   }
   auto start_color = Math::Vector3{0.0, 0.0, 1.0};
@@ -55,6 +56,7 @@ auto raytracer(Renderer &renderer) -> void {
   // these vectors represent the width and height of the viewport
   // u = width
   // v = height
+  HittableList world = {std::unique_ptr<Hittable>(new Sphere{0.5, {0, 0, -1}})};
   const auto viewport_u = Math::Vector3{viewport_width, 0, 0};
   const auto viewport_v = Math::Vector3{0, -viewport_height, 0};
   // calculate the per pixel delta based on these values

@@ -3,12 +3,25 @@
 
 #include "Ray.h"
 #include "Vector3.h"
+#include <list>
+#include <memory>
 
 struct HitResult {
   Math::Point3 Location;
   Math::Vector3 Normal;
   double T;
+  bool IsHittingFrontFace;
 };
+
+inline auto isInside(const Math::Vector3 &surfaceNormal,
+                     const Math::Vector3 &attackVector) -> bool {
+  if (Math::dot(surfaceNormal, attackVector) > 0.0) {
+    // the ray is inside the the surface
+    return true;
+  }
+  // otherwise its on the outside (facing opposite general directions)
+  return false;
+}
 
 class Hittable {
 public:
@@ -21,7 +34,8 @@ public:
 
 class Sphere : public Hittable {
 public:
-  explicit Sphere() {}
+  explicit Sphere(double radius, const Math::Point3 &location)
+      : radius_{radius}, location_{location} {}
 
   auto hit(const Math::Ray &ray, double min_t, double max_t,
            HitResult &hit) const -> bool override;
@@ -32,6 +46,21 @@ public:
 private:
   double radius_;
   Math::Point3 location_;
+};
+
+class HittableList {
+  std::list<std::unique_ptr<Hittable>> hittables_;
+
+public:
+  HittableList(std::<std::unique_ptr<Hittable>> &hittables)
+      : hittables_{hittables} {}
+
+  auto addNew(std::unique_ptr<Hittable> &h) -> void {
+    hittables_.push_back(std::move(h));
+  }
+
+  auto hit(const Math::Ray &ray, double min_t, double max_t,
+           HitResult &out_result) const -> bool;
 };
 
 #endif // HITTABLE_H
