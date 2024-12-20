@@ -3,6 +3,7 @@
 #include "Renderer.h"
 #include "SDL3/SDL_events.h"
 #include "Vector3.h"
+#include <initializer_list>
 #include <iostream>
 #include <memory>
 
@@ -31,7 +32,7 @@ inline auto operator*(double scale, const Color &c) -> Color {
 auto getRayColor(const Math::Ray &r, const HittableList &world) -> Color {
   auto result = HitResult{};
   if (world.hit(r, 0, 600000.0, result)) {
-    std::cout << "yes" << std::endl;
+    std::cout << result.Location.y << std::endl;
     auto &hit_point = result.Location;
     auto &normal = result.Normal;
     return 0.5 * Color{normal.x + 1.0, normal.y + 1.0, normal.z + 1.0};
@@ -46,6 +47,15 @@ auto getRayColor(const Math::Ray &r, const HittableList &world) -> Color {
   return Color{1.0 * lerped.x, 1.0 * lerped.y, 1.0 * lerped.z};
 }
 
+auto createWorld() -> HittableList {
+  auto l = HittableList::ListType{
+      std::static_pointer_cast<Hittable>(
+          std::make_shared<Sphere>(0.5, Math::Point3{0, 0, 1.0})),
+      std::static_pointer_cast<Hittable>(
+          std::make_shared<Sphere>(100, Math::Point3{0, -100.5, -1}))};
+  return {l};
+}
+
 auto raytracer(Renderer &renderer) -> void {
   constexpr static auto aspect_ratio =
       double(Renderer::getWidth()) / double(Renderer::getHeight());
@@ -56,24 +66,24 @@ auto raytracer(Renderer &renderer) -> void {
   // these vectors represent the width and height of the viewport
   // u = width
   // v = height
-  HittableList world = {std::unique_ptr<Hittable>(new Sphere{0.5, {0, 0, -1}})};
-  const auto viewport_u = Math::Vector3{viewport_width, 0, 0};
-  const auto viewport_v = Math::Vector3{0, -viewport_height, 0};
+  const auto viewport_u = Math::Vector3{-viewport_width, 0, 0};
+  const auto viewport_v = Math::Vector3{0, viewport_height, 0};
   // calculate the per pixel delta based on these values
   const auto delta_viewport_u = viewport_u / double(Renderer::getWidth());
-  const auto delta_viewport_v = viewport_v / double(Renderer::getHeight());
+  const auto delta_viewport_v = (viewport_v) / double(Renderer::getHeight());
   constexpr static auto focal_length =
-      1.0; // this affects the FOV (the farther from the camera, the more zoomed
-           // in)
+      1.0; // this affects the FOV (the farther from the camera, the more
+           // zoomed in)
   // first translate the camera's grid away from the center to avoid infinite
   // fov then shift up and left from the middle to the corner
   auto viewport_upper_left =
       (camera_center - Math::Vector3{0, 0, focal_length}) - viewport_u / 2 -
       viewport_v / 2;
-  // now find the position of the top left pixel in world space, and then inset
-  // it to be in the middle of the pixel (by delta in world space)
+  // now find the position of the top left pixel in world space, and then
+  // inset it to be in the middle of the pixel (by delta in world space)
   auto pixel00_location =
       viewport_upper_left + 0.5 * (delta_viewport_u + delta_viewport_v);
+  auto list = createWorld();
   // render
   for (auto i = 0; i < Renderer::getHeight(); ++i) {
     for (auto j = 0; j < Renderer::getWidth(); ++j) {
@@ -81,8 +91,9 @@ auto raytracer(Renderer &renderer) -> void {
                             double(i) * delta_viewport_v;
       auto ray_direction = Math::unitVector(pixel_location - camera_center);
       auto ray = Math::Ray{camera_center, ray_direction};
-      auto color = getRayColor(ray);
+      auto color = getRayColor(ray, list);
       renderer.putPixel(j, i, color);
+      std::cout << "pixel00" << pixel00_location << "\n";
     }
   }
 }

@@ -9,6 +9,7 @@ add_subdirectory(vendor/SDL)
 
 add_executable(${PROJECT_NAME} 
   src/main.cpp
-  src/Renderer.cpp
+  src/Renderer.cpp 
+  src/Hittable.cpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3-shared)

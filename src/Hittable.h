@@ -49,18 +49,19 @@ private:
 };
 
 class HittableList {
-  std::list<std::unique_ptr<Hittable>> hittables_;
-
 public:
-  HittableList(std::<std::unique_ptr<Hittable>> &hittables)
-      : hittables_{hittables} {}
+  using ListType = std::list<std::shared_ptr<Hittable>>;
+  HittableList(ListType &l) : hittables_{std::move(l)} {}
 
-  auto addNew(std::unique_ptr<Hittable> &h) -> void {
+  auto addNew(std::shared_ptr<Hittable> &h) -> void {
     hittables_.push_back(std::move(h));
   }
 
   auto hit(const Math::Ray &ray, double min_t, double max_t,
            HitResult &out_result) const -> bool;
+
+private:
+  ListType hittables_;
 };
 
 #endif // HITTABLE_H
