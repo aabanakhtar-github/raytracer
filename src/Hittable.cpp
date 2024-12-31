@@ -4,7 +4,7 @@
 
 // goofy ahh math
 
-auto Sphere::hit(const Math::Ray &ray, double min_t, double max_t,
+auto Sphere::hit(const Math::Ray &ray, const Interval &interval,
                  HitResult &hit) const -> bool {
   // definition of a circle
   // point x y z -> (x - x)^2 + (y - y)^2 + (z - z)^2 = r^2
@@ -22,9 +22,9 @@ auto Sphere::hit(const Math::Ray &ray, double min_t, double max_t,
   // the next closest
   auto root = (-h - std::sqrt(discriminant)) /
               a; // choose the root based on the quadratic results
-  if (root >= max_t || root <= min_t) {
+  if () {
     auto root2 = (-h + std::sqrt(discriminant)) / a;
-    if (root2 >= max_t || root2 <= min_t) {
+    if (root2 >= interval.Max || root2 <= interval.Min) {
       return false;
     }
     root = root2;
@@ -43,15 +43,16 @@ auto Sphere::hit(const Math::Ray &ray, double min_t, double max_t,
   return true;
 }
 
-auto HittableList::hit(const Math::Ray &ray, double min_t, double max_t,
+auto HittableList::hit(const Math::Ray &ray, const Interval &interval,
                        HitResult &out_result) const -> bool {
-  auto closest_so_far = max_t;   // filters out anything that is farther than
-                                 // necessary (higher T value)
-  bool has_hit_anything = false; // returned
+  auto closest_so_far = interval.Max; // filters out anything that is farther
+                                      // than necessary (higher T value)
+  bool has_hit_anything = false;      // returned
   auto temporary_hit_result = HitResult{}; // so that the funciton doesn't fill
                                            // invalid data if it doesn't hit
   for (const auto &hittable : hittables_) {
-    if (hittable->hit(ray, min_t, closest_so_far, temporary_hit_result)) {
+    if (hittable->hit(ray, Interval{interval.Min, closest_so_far},
+                      temporary_hit_result)) {
       // filter out anything with a higher T on next iter
       closest_so_far = temporary_hit_result.T;
       has_hit_anything = true;

@@ -1,6 +1,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+#include "Interval.h"
 #include "Ray.h"
 #include "Vector3.h"
 #include <list>
@@ -28,7 +29,7 @@ public:
   virtual ~Hittable() = default;
 
   // out parameter
-  virtual auto hit(const Math::Ray &ray, double min_t, double max_t,
+  virtual auto hit(const Math::Ray &ray, const Interval &interval,
                    HitResult &result) const -> bool = 0;
 };
 
@@ -37,7 +38,7 @@ public:
   explicit Sphere(double radius, const Math::Point3 &location)
       : radius_{radius}, location_{location} {}
 
-  auto hit(const Math::Ray &ray, double min_t, double max_t,
+  auto hit(const Math::Ray &ray, const Interval &interval,
            HitResult &hit) const -> bool override;
 
   auto getRadius() const -> double { return radius_; }
@@ -57,7 +58,7 @@ public:
     hittables_.push_back(std::move(h));
   }
 
-  auto hit(const Math::Ray &ray, double min_t, double max_t,
+  auto hit(const Math::Ray &ray, const Interval &interval,
            HitResult &out_result) const -> bool;
 
 private:
