@@ -5,6 +5,7 @@
 #include "Vector3.h"
 #include <initializer_list>
 #include <iostream>
+#include <limits>
 #include <memory>
 
 auto hitSphere(const Math::Ray &ray, const Math::Point3 center,
@@ -31,7 +32,7 @@ inline auto operator*(double scale, const Color &c) -> Color {
 
 auto getRayColor(const Math::Ray &r, const HittableList &world) -> Color {
   auto result = HitResult{};
-  if (world.hit(r, 0, 600000.0, result)) {
+  if (world.hit(r, Interval{0, std::numeric_limits<double>::max()}, result)) {
     std::cout << result.Location.y << std::endl;
     auto &hit_point = result.Location;
     auto &normal = result.Normal;

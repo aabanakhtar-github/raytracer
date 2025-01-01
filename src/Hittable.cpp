@@ -22,9 +22,9 @@ auto Sphere::hit(const Math::Ray &ray, const Interval &interval,
   // the next closest
   auto root = (-h - std::sqrt(discriminant)) /
               a; // choose the root based on the quadratic results
-  if () {
+  if (!interval.contains(root)) {
     auto root2 = (-h + std::sqrt(discriminant)) / a;
-    if (root2 >= interval.Max || root2 <= interval.Min) {
+    if (!interval.contains(root2)) {
       return false;
     }
     root = root2;
