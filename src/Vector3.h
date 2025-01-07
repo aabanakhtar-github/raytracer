@@ -10,38 +10,38 @@ namespace Math {
 
 class Vector3 {
 public:
-  Vector3() : x{0}, y{0}, z{0} {}
-  Vector3(double x, double y, double z) : x{x}, y{y}, z{z} {}
-
-  auto operator+=(const Vector3 &v) -> Vector3 & {
+  constexpr Vector3() : x{0}, y{0}, z{0} {}
+  constexpr Vector3(double x, double y, double z) : x{x}, y{y}, z{z} {}
+  constexpr Vector3(const Vector3 &v) : x{v.x}, y{v.y}, z{v.z} {}
+  constexpr auto operator+=(const Vector3 &v) -> Vector3 & {
     x += v.x;
     y += v.y;
     z += v.z;
     return *this;
   }
 
-  auto operator-=(const Vector3 &v) -> Vector3 & {
+  constexpr auto operator-=(const Vector3 &v) -> Vector3 & {
     x -= v.x;
     y -= v.y;
     z -= v.z;
     return *this;
   }
 
-  auto operator*=(const Vector3 &v) -> Vector3 & {
+  constexpr auto operator*=(const Vector3 &v) -> Vector3 & {
     x *= v.x;
     y *= v.y;
     z *= v.z;
     return *this;
   }
 
-  auto operator*=(double scalar) -> Vector3 & {
+  constexpr auto operator*=(double scalar) -> Vector3 & {
     x *= scalar;
     y *= scalar;
     z *= scalar;
     return *this;
   }
 
-  auto operator/=(double scalar) -> Vector3 & {
+  constexpr auto operator/=(double scalar) -> Vector3 & {
     assert(scalar != 0 && "Divide vector by zero.");
     x /= scalar;
     y /= scalar;
@@ -49,7 +49,9 @@ public:
     return *this;
   }
 
-  auto length() const -> double { return std::sqrt(x * x + y * y + z * z); }
+  constexpr auto length() const -> double {
+    return std::sqrt(x * x + y * y + z * z);
+  }
 
   double x, y, z;
 };
