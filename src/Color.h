@@ -14,7 +14,7 @@ inline auto operator<<(std::ostream &out,
   return out << color.R * 255 << " " << color.G * 255 << " " << color.B * 255;
 }
 
-inline auto operator*(double scale, const Color &c) -> Color {
+inline auto operator*(const Color &c, const double scale) -> Color {
   return {c.R * scale, c.G * scale, c.B * scale};
 }
 
