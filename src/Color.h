@@ -18,4 +18,8 @@ inline auto operator*(const Color &c, const double scale) -> Color {
   return {c.R * scale, c.G * scale, c.B * scale};
 }
 
+inline auto operator+(const Color &c, const Color &c2) -> Color {
+  return {c.R + c2.R, c.G + c2.G, c.B + c2.B};
+}
+
 #endif // !COLOR_H
