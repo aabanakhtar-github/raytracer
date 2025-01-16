@@ -44,21 +44,11 @@ auto Camera::getRandomSquare() -> Math::Vector3 {
   return Math::Vector3{randomDouble() - 0.9, randomDouble() - 0.9, 0};
 }
 
-<<<<<<< HEAD
-auto Camera::getRayColor(const Math::Ray &r,
-                         const HittableList &world) -> Color {
-  auto result = HitResult{};
-  if (world.hit(r, Interval{0, std::numeric_limits<double>::max()}, result)) {
-    auto &hit_point = result.Location;
-    auto &normal = result.Normal;
-    return Color{normal.x + 1.0, normal.y + 1.0, normal.z + 1.0} * 0.5;
-=======
 auto Camera::getRayColor(const Math::Ray &r, const HittableList &world,
                          std::size_t bounce_count) -> Color {
   // to prevent infinite bounces
   if (bounce_count <= 0) {
     return Color{0, 0, 0};
->>>>>>> f8c7a41 (.)
   }
   auto result = HitResult{};
   if (world.hit(r, Interval{0.01, 6000}, result)) {
