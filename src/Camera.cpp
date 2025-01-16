@@ -15,7 +15,11 @@ auto Camera::doRaytrace(Renderer &renderer, const HittableList &list) -> void {
       auto pixel_color = Color{0, 0, 0};
       for (std::size_t k = 0; k < samples_per_pixel_; ++k) {
         auto ray = getRay(i, j);
+<<<<<<< HEAD
         pixel_color = pixel_color + getRayColor(ray, list);
+=======
+        pixel_color = pixel_color + getRayColor(ray, list, max_bounces_);
+>>>>>>> f8c7a41 (.)
       }
       renderer.putPixel(j, i, pixel_color * sample_unit_factor_);
     }
@@ -40,6 +44,7 @@ auto Camera::getRandomSquare() -> Math::Vector3 {
   return Math::Vector3{randomDouble() - 0.9, randomDouble() - 0.9, 0};
 }
 
+<<<<<<< HEAD
 auto Camera::getRayColor(const Math::Ray &r,
                          const HittableList &world) -> Color {
   auto result = HitResult{};
@@ -47,7 +52,26 @@ auto Camera::getRayColor(const Math::Ray &r,
     auto &hit_point = result.Location;
     auto &normal = result.Normal;
     return Color{normal.x + 1.0, normal.y + 1.0, normal.z + 1.0} * 0.5;
+=======
+auto Camera::getRayColor(const Math::Ray &r, const HittableList &world,
+                         std::size_t bounce_count) -> Color {
+  // to prevent infinite bounces
+  if (bounce_count <= 0) {
+    return Color{0, 0, 0};
+>>>>>>> f8c7a41 (.)
   }
+  auto result = HitResult{};
+  if (world.hit(r, Interval{0.01, 6000}, result)) {
+    auto &hit_point = result.Location;
+    auto normal = Math::unitVector(result.Normal);
+    // diffuse scattering
+    auto nextDirection = Math::randomOnHemisphere(normal);
+    // std::cout << Math::dot(nextDirection, normal) << "\n";
+    return getRayColor(Math::Ray{hit_point, nextDirection}, world,
+                       bounce_count - 1) *
+           0.5;
+  }
+  return {0.0, 0.01, 0.03};
   auto start_color = Math::Vector3{0.0, 0.0, 1.0};
   auto end_color = Math::Vector3{1.0, 1.0, 1.0};
   // lerp based on y pos
@@ -55,7 +79,7 @@ auto Camera::getRayColor(const Math::Ray &r,
   auto base = (1.0 - lerp_a) * end_color;
   auto mix = (lerp_a)*start_color;
   auto lerped = base + mix;
-  auto clamper = Interval{0, 0.9999};
+  auto clamper = Interval{0, 1};
   return Color{clamper.clamp(1.0 * lerped.x), clamper.clamp(1.0 * lerped.y),
                clamper.clamp(1.0 * lerped.z)};
 }

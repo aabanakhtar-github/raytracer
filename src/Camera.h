@@ -13,7 +13,8 @@ public:
   auto doRaytrace(Renderer &renderer, const HittableList &world) -> void;
 
 private:
-  auto getRayColor(const Math::Ray &r, const HittableList &world) -> Color;
+  auto getRayColor(const Math::Ray &r, const HittableList &world,
+                   std::size_t bounces) -> Color;
   auto getRay(double i, double j) -> Math::Ray;
   auto getRandomSquare() -> Math::Vector3;
 
@@ -40,6 +41,7 @@ private:
   constexpr static auto focal_length =
       1.0; // this affects the FOV (the farther from the camera, the more
            // zoomed in)
+  constexpr static std::size_t max_bounces_ = 10;
 };
 
 #endif // CAMERA_H

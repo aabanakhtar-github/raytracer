@@ -16,12 +16,7 @@ struct HitResult {
 
 inline auto isInside(const Math::Vector3 &surfaceNormal,
                      const Math::Vector3 &attackVector) -> bool {
-  if (Math::dot(surfaceNormal, attackVector) > 0.0) {
-    // the ray is inside the the surface
-    return true;
-  }
-  // otherwise its on the outside (facing opposite general directions)
-  return false;
+  return Math::dot(surfaceNormal, attackVector) < 0.0;
 }
 
 class Hittable {

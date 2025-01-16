@@ -4,8 +4,9 @@
 #include <random>
 
 inline auto randomDouble() -> double {
+  std::random_device rd;
   static auto dist = std::uniform_real_distribution<double>(0.0, 1.0);
-  static auto gen = std::mt19937{};
+  static auto gen = std::mt19937{rd()};
   return dist(gen);
 }
 

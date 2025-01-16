@@ -2,9 +2,12 @@
 #ifndef VECTOR_UTILITY_H
 #define VECTOR_UTILITY_H
 
+#include "NumUtil.h"
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
+#include <random>
 
 namespace Math {
 
@@ -98,6 +101,29 @@ inline auto cross(const Vector3 &u, const Vector3 &v) -> Vector3 {
 }
 
 inline auto unitVector(const Vector3 &v) -> Vector3 { return v / v.length(); }
+
+inline auto randomVector(double min, double max) -> Vector3 {
+  return Vector3{randomDouble(min, max), randomDouble(min, max),
+                 randomDouble(min, max)};
+}
+
+inline auto randomUnitVector() -> Vector3 {
+  while (true) {
+    auto vector = randomVector(-1, 1);
+    auto vec_length = vector.length() * vector.length();
+    if (1e-160 <= vec_length && vec_length <= 1.0) {
+      return vector / std::sqrt(vec_length);
+    }
+  }
+}
+
+inline auto randomOnHemisphere(const Vector3 &up_normal) -> Vector3 {
+  auto vector = randomUnitVector();
+  if (dot(up_normal, vector) > 0.0) {
+    return vector;
+  }
+  return (-1.0 * vector);
+}
 
 } // namespace Math
 
